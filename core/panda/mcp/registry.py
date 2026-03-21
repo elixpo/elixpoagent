@@ -84,6 +84,7 @@ def create_default_registry() -> ToolRegistry:
         GitCommitTool,
         GitBranchTool,
     )
+    from panda.mcp.tools.github_tools import GitPushTool, GitCloneTool
 
     registry = ToolRegistry()
     for tool_cls in [
@@ -99,6 +100,8 @@ def create_default_registry() -> ToolRegistry:
         GitLogTool,
         GitCommitTool,
         GitBranchTool,
+        GitPushTool,
+        GitCloneTool,
     ]:
         registry.register(tool_cls())
     return registry

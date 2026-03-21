@@ -1,16 +1,19 @@
-"""FastAPI routes — health, sessions, webhook placeholder."""
+"""FastAPI routes — health, sessions, GitHub webhook."""
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
 from panda.agent.session import SessionStore
 from panda.config import settings
+from panda.github.handler import GitHubEventHandler
+from panda.github.webhooks import parse_webhook
 
 router = APIRouter()
 
 _session_store = SessionStore(settings.agent.session_storage_path)
+_github_handler = GitHubEventHandler()
 
 
 @router.get("/health")
@@ -85,6 +88,12 @@ async def delete_session(session_id: str):
 
 
 @router.post("/webhook/github")
-async def github_webhook():
-    """GitHub webhook endpoint — placeholder for Phase 2."""
-    return {"status": "received"}
+async def github_webhook(request: Request):
+    """GitHub webhook endpoint — receives events, verifies signature, dispatches to agent."""
+    webhook = await parse_webhook(request)
+    result = await _github_handler.handle_event(
+        event=webhook["event"],
+        action=webhook["action"],
+        payload=webhook["payload"],
+    )
+    return result
