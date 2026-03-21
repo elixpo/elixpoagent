@@ -1,3 +1,3 @@
-# Panda Core
+# Elixpo Core
 
-Autonomous AI agent engine powering the Panda system.
+Autonomous AI agent engine powering the Elixpo system.

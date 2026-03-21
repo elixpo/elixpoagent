@@ -5,7 +5,7 @@ import hmac
 
 import pytest
 
-from panda.github.webhooks import (
+from elixpo.github.webhooks import (
     extract_task_from_mention,
     is_bot_mentioned,
     verify_signature,

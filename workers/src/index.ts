@@ -1,5 +1,5 @@
 /**
- * Panda Cloudflare Worker — edge API for D1 and KV operations.
+ * Elixpo Cloudflare Worker — edge API for D1 and KV operations.
  * The core agent runs on the VPS; this worker provides:
  *   - D1 read/write for user data, sessions metadata, memories
  *   - KV for rate limiting, feature flags

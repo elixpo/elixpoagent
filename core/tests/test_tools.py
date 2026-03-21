@@ -5,13 +5,13 @@ import tempfile
 
 import pytest
 
-from panda.mcp.tools.file_read import FileReadTool
-from panda.mcp.tools.file_write import FileWriteTool
-from panda.mcp.tools.file_edit import FileEditTool
-from panda.mcp.tools.directory_tree import DirectoryTreeTool
-from panda.mcp.tools.grep import GrepTool
-from panda.mcp.tools.glob import GlobTool
-from panda.mcp.registry import ToolRegistry
+from elixpo.mcp.tools.file_read import FileReadTool
+from elixpo.mcp.tools.file_write import FileWriteTool
+from elixpo.mcp.tools.file_edit import FileEditTool
+from elixpo.mcp.tools.directory_tree import DirectoryTreeTool
+from elixpo.mcp.tools.grep import GrepTool
+from elixpo.mcp.tools.glob import GlobTool
+from elixpo.mcp.registry import ToolRegistry
 
 
 @pytest.fixture
@@ -109,7 +109,7 @@ async def test_path_traversal_blocked(workspace):
 
 
 def test_registry():
-    from panda.mcp.registry import create_default_registry
+    from elixpo.mcp.registry import create_default_registry
     registry = create_default_registry()
     tool_defs = registry.list_tool_defs()
     names = [t.function.name for t in tool_defs]

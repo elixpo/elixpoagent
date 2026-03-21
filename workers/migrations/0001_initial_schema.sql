@@ -1,5 +1,5 @@
 -- Migration: 0001_initial_schema
--- Panda D1 Schema — users, repos, installations, sessions metadata, memories
+-- Elixpo D1 Schema — users, repos, installations, sessions metadata, memories
 
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,

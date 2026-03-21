@@ -9,12 +9,12 @@ services:
       - sessions_data:/data/sessions
       - workspaces_data:/data/workspaces
     environment:
-      - PANDA_LLM_API_URL=${PANDA_LLM_API_URL:-https://api.openai.com/v1}
-      - PANDA_LLM_API_KEY=${PANDA_LLM_API_KEY}
-      - PANDA_LLM_MODEL=${PANDA_LLM_MODEL:-gpt-4o}
-      - PANDA_DEBUG=true
-      - PANDA_SESSION_STORAGE_PATH=/data/sessions
-      - PANDA_WORKSPACE_PATH=/data/workspaces
+      - ELIXPO_LLM_API_URL=${ELIXPO_LLM_API_URL:-https://api.openai.com/v1}
+      - ELIXPO_LLM_API_KEY=${ELIXPO_LLM_API_KEY}
+      - ELIXPO_LLM_MODEL=${ELIXPO_LLM_MODEL:-gpt-4o}
+      - ELIXPO_DEBUG=true
+      - ELIXPO_SESSION_STORAGE_PATH=/data/sessions
+      - ELIXPO_WORKSPACE_PATH=/data/workspaces
     restart: unless-stopped
 
   frontend:

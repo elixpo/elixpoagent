@@ -46,7 +46,7 @@ export default function Home() {
             </Button>
           </a>
           <a
-            href="https://github.com/elixpo/panda"
+            href="https://github.com/elixpo/elixpoagent"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -119,13 +119,13 @@ export default function Home() {
             <div>
               <p className="text-xs text-[rgba(245,245,244,0.4)] mb-1.5 font-medium uppercase tracking-wider">via pip</p>
               <pre className="bg-[rgba(255,255,255,0.04)] border border-white/[0.06] rounded-xl px-4 py-3 text-sm font-mono text-[#a3e635]">
-                pip install panda-cli
+                pip install elixpo-cli
               </pre>
             </div>
             <div>
               <p className="text-xs text-[rgba(245,245,244,0.4)] mb-1.5 font-medium uppercase tracking-wider">via npm</p>
               <pre className="bg-[rgba(255,255,255,0.04)] border border-white/[0.06] rounded-xl px-4 py-3 text-sm font-mono text-[#86efac]">
-                npx panda-agent
+                npx elixpo-agent
               </pre>
             </div>
           </div>
@@ -144,13 +144,13 @@ export default function Home() {
           </div>
           <pre className="bg-[rgba(255,255,255,0.04)] border border-white/[0.06] rounded-xl px-4 py-4 text-sm font-mono whitespace-pre-wrap leading-relaxed">
             <span className="text-[rgba(245,245,244,0.35)]"># Configure your API key</span>
-{"\n"}<span className="text-[#f5f5f4]">panda config</span> <span className="text-[#a3e635]">--api-key</span> <span className="text-[#fbbf24]">sk-...</span>
+{"\n"}<span className="text-[#f5f5f4]">elixpo config</span> <span className="text-[#a3e635]">--api-key</span> <span className="text-[#fbbf24]">sk-...</span>
 {"\n"}
 {"\n"}<span className="text-[rgba(245,245,244,0.35)]"># Start an interactive session</span>
-{"\n"}<span className="text-[#f5f5f4]">panda chat</span>
+{"\n"}<span className="text-[#f5f5f4]">elixpo chat</span>
 {"\n"}
 {"\n"}<span className="text-[rgba(245,245,244,0.35)]"># Or give a direct task</span>
-{"\n"}<span className="text-[#f5f5f4]">panda chat</span> <span className="text-[#86efac]">"add input validation"</span>
+{"\n"}<span className="text-[#f5f5f4]">elixpo chat</span> <span className="text-[#86efac]">"add input validation"</span>
           </pre>
         </div>
       </section>

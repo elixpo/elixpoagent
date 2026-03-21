@@ -83,7 +83,7 @@ export default function RootLayout({
                 Settings
               </a>
               <a
-                href="https://github.com/elixpo/panda"
+                href="https://github.com/elixpo/elixpoagent"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-[rgba(245,245,244,0.6)] hover:text-[#f5f5f4] transition-colors font-medium"
@@ -156,7 +156,7 @@ export default function RootLayout({
                     Settings
                   </a>
                   <a
-                    href="https://github.com/elixpo/panda"
+                    href="https://github.com/elixpo/elixpoagent"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-[rgba(245,245,244,0.5)] hover:text-[#f5f5f4] transition-colors"
@@ -184,7 +184,7 @@ export default function RootLayout({
                     GitHub
                   </a>
                   <a
-                    href="https://github.com/elixpo/panda"
+                    href="https://github.com/elixpo/elixpoagent"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-[rgba(245,245,244,0.5)] hover:text-[#f5f5f4] transition-colors"

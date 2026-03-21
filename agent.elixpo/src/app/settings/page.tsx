@@ -12,7 +12,7 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("panda_api_url", apiUrl);
+      localStorage.setItem("elixpo_api_url", apiUrl);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     }

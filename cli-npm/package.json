@@ -1,11 +1,11 @@
 {
-  "name": "panda-agent",
+  "name": "elixpo-agent",
   "version": "0.1.0",
-  "description": "Panda AI Agent — autonomous software engineering CLI (npm wrapper)",
+  "description": "Elixpo AI Agent — autonomous software engineering CLI (npm wrapper)",
   "bin": {
-    "panda-agent": "./bin/panda.js"
+    "elixpo-agent": "./bin/elixpo.js"
   },
-  "keywords": ["ai", "agent", "coding", "llm", "panda", "elixpo"],
+  "keywords": ["ai", "agent", "coding", "llm", "elixpo"],
   "author": "elixpo <elixpoo@gmail.com>",
   "license": "MIT",
   "engines": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/elixpo/panda.git",
+    "url": "https://github.com/elixpo/elixpoagent.git",
     "directory": "cli-npm"
   }
 }

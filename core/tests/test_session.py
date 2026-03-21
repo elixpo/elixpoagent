@@ -2,8 +2,8 @@
 
 import pytest
 
-from panda.agent.session import Session, SessionStatus, SessionStore, SessionTrigger
-from panda.llm.models import Message
+from elixpo.agent.session import Session, SessionStatus, SessionStore, SessionTrigger
+from elixpo.llm.models import Message
 
 
 @pytest.fixture

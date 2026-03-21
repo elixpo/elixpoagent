@@ -7,10 +7,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY core/pyproject.toml core/
-COPY core/panda/ core/panda/
+COPY core/elixpo/ core/elixpo/
 
 RUN pip install --no-cache-dir ./core
 
 EXPOSE 8000
 
-CMD ["uvicorn", "panda.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "elixpo.main:app", "--host", "0.0.0.0", "--port", "8000"]
