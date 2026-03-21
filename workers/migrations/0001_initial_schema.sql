@@ -1,4 +1,5 @@
--- Panda D1 Schema -- Cloudflare D1 (SQLite-compatible)
+-- Migration: 0001_initial_schema
+-- Panda D1 Schema — users, repos, installations, sessions metadata, memories
 
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
@@ -24,7 +25,7 @@ CREATE TABLE IF NOT EXISTS repos (
 );
 
 CREATE TABLE IF NOT EXISTS installations (
-    id INTEGER PRIMARY KEY,  -- GitHub App installation ID
+    id INTEGER PRIMARY KEY,
     account_type TEXT NOT NULL DEFAULT 'user',
     account_login TEXT NOT NULL,
     account_id INTEGER NOT NULL,
@@ -71,3 +72,4 @@ CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions_meta(status);
 CREATE INDEX IF NOT EXISTS idx_memories_repo ON memories(repo_id);
 CREATE INDEX IF NOT EXISTS idx_memories_category ON memories(category);
 CREATE INDEX IF NOT EXISTS idx_repos_full_name ON repos(full_name);
+CREATE INDEX IF NOT EXISTS idx_users_github ON users(github_user_id);
