@@ -79,6 +79,43 @@ async def create_session(req: CreateSessionRequest):
     }
 
 
+class ResumeSessionRequest(BaseModel):
+    follow_up: str
+    workspace_path: str | None = None
+
+
+@router.post("/api/v1/sessions/{session_id}/message")
+async def resume_session(session_id: str, req: ResumeSessionRequest):
+    """Send a follow-up message to an existing session, resuming it."""
+    from panda.agent.engine import AgentEngine
+    from panda.llm.client import LLMClient
+    from panda.mcp.registry import create_default_registry
+
+    session = _session_store.load(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    llm = LLMClient()
+    tools = create_default_registry()
+    engine = AgentEngine(llm=llm, tools=tools, session_store=_session_store)
+
+    events = []
+    async for event in engine.resume(
+        session_id=session_id,
+        follow_up=req.follow_up,
+        workspace_path=req.workspace_path,
+    ):
+        events.append(event.to_dict())
+
+    await llm.close()
+
+    return {
+        "session_id": session_id,
+        "status": session.status.value,
+        "events": events,
+    }
+
+
 @router.delete("/api/v1/sessions/{session_id}")
 async def delete_session(session_id: str):
     deleted = _session_store.delete(session_id)
