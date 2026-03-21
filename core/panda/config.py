@@ -40,11 +40,21 @@ class SandboxSettings(BaseSettings):
     memory_limit: str = "512M"
 
 
+class CloudflareSettings(BaseSettings):
+    model_config = {"env_prefix": "PANDA_CF_"}
+
+    account_id: str = ""
+    d1_database_id: str = "4c028188-932f-4808-81ba-67e67a832be7"
+    kv_namespace_id: str = "8e440b0aebbe4961a655915469da98df"
+    api_token: str = ""
+
+
 class Settings(BaseSettings):
     llm: LLMSettings = LLMSettings()
     github: GitHubSettings = GitHubSettings()
     agent: AgentSettings = AgentSettings()
     sandbox: SandboxSettings = SandboxSettings()
+    cloudflare: CloudflareSettings = CloudflareSettings()
 
     api_secret_key: str = "dev-secret-change-me"
     cors_origins: list[str] = ["http://localhost:3000"]

@@ -4,14 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import os
-import sys
 
 import typer
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.prompt import Prompt
-from rich.text import Text
 
 from panda_cli.config import get_api_key, get_api_url, get_model, load_config, save_config
 
@@ -29,6 +27,7 @@ def chat(
     workspace: str = typer.Option(".", "--workspace", "-w", help="Working directory for the agent."),
     model: str = typer.Option(None, "--model", "-m", help="LLM model override."),
     api_url: str = typer.Option(None, "--api-url", help="LLM API URL override."),
+    resume: str = typer.Option(None, "--resume", "-r", help="Resume a previous session by ID."),
 ):
     """Start an agent session — give it a task or chat interactively."""
     api_key = get_api_key()
@@ -51,7 +50,11 @@ def chat(
         border_style="green",
     ))
 
-    if task:
+    if resume and task:
+        asyncio.run(_resume_session(
+            resume, task, resolved_workspace, resolved_url, api_key, resolved_model,
+        ))
+    elif task:
         asyncio.run(_run_task(task, resolved_workspace, resolved_url, api_key, resolved_model))
     else:
         asyncio.run(_interactive_loop(resolved_workspace, resolved_url, api_key, resolved_model))
@@ -70,6 +73,7 @@ async def _run_task(task: str, workspace: str, api_url: str, api_key: str, model
     engine = AgentEngine(llm=llm, tools=tools, session_store=store)
 
     session = Session(trigger=SessionTrigger.CLI, max_steps=50)
+    console.print(f"[dim]Session: {session.id}[/dim]")
 
     async for event in engine.run(session, task=task, workspace_path=workspace):
         _render_event(event)
@@ -77,8 +81,35 @@ async def _run_task(task: str, workspace: str, api_url: str, api_key: str, model
     await llm.close()
 
 
+async def _resume_session(
+    session_id: str, follow_up: str, workspace: str,
+    api_url: str, api_key: str, model: str,
+):
+    """Resume an existing session with a follow-up message."""
+    from panda.agent.engine import AgentEngine
+    from panda.agent.session import SessionStore
+    from panda.llm.client import LLMClient
+    from panda.mcp.registry import create_default_registry
+
+    llm = LLMClient(api_url=api_url, api_key=api_key, model=model)
+    tools = create_default_registry()
+    store = SessionStore(os.path.join(workspace, ".panda_sessions"))
+    engine = AgentEngine(llm=llm, tools=tools, session_store=store)
+
+    console.print(f"[dim]Resuming session: {session_id}[/dim]")
+
+    async for event in engine.resume(
+        session_id=session_id,
+        follow_up=follow_up,
+        workspace_path=workspace,
+    ):
+        _render_event(event)
+
+    await llm.close()
+
+
 async def _interactive_loop(workspace: str, api_url: str, api_key: str, model: str):
-    """Interactive chat loop — keep sending tasks until user exits."""
+    """Interactive multi-turn chat — maintains session state across messages."""
     from panda.agent.engine import AgentEngine
     from panda.agent.session import Session, SessionStore, SessionTrigger
     from panda.llm.client import LLMClient
@@ -88,7 +119,13 @@ async def _interactive_loop(workspace: str, api_url: str, api_key: str, model: s
     tools = create_default_registry()
     store = SessionStore(os.path.join(workspace, ".panda_sessions"))
 
-    console.print("[dim]Type your task, or 'exit' to quit.[/dim]\n")
+    # Single session persists across the interactive loop (multi-turn)
+    session = Session(trigger=SessionTrigger.CLI, max_steps=200)
+    engine = AgentEngine(llm=llm, tools=tools, session_store=store)
+    first_message = True
+
+    console.print(f"[dim]Session: {session.id}[/dim]")
+    console.print("[dim]Type your task, or 'exit' to quit. Session persists across messages.[/dim]\n")
 
     while True:
         try:
@@ -96,22 +133,28 @@ async def _interactive_loop(workspace: str, api_url: str, api_key: str, model: s
         except (KeyboardInterrupt, EOFError):
             break
 
-        if task.strip().lower() in ("exit", "quit", "q"):
+        stripped = task.strip().lower()
+        if stripped in ("exit", "quit", "q"):
             break
-
         if not task.strip():
             continue
 
-        engine = AgentEngine(llm=llm, tools=tools, session_store=store)
-        session = Session(trigger=SessionTrigger.CLI, max_steps=50)
-
-        async for event in engine.run(session, task=task, workspace_path=workspace):
-            _render_event(event)
+        if first_message:
+            async for event in engine.run(session, task=task, workspace_path=workspace):
+                _render_event(event)
+            first_message = False
+        else:
+            # Continue the same session with a follow-up
+            session.status = session.status.__class__("running")
+            session.completed_at = None
+            async for event in engine.run(session, task=task, workspace_path=workspace):
+                _render_event(event)
 
         console.print()
 
     await llm.close()
-    console.print("[dim]Goodbye.[/dim]")
+    console.print(f"[dim]Session saved: {session.id}[/dim]")
+    console.print("[dim]Resume with: panda chat --resume {session.id} \"your follow-up\"[/dim]")
 
 
 def _render_event(event):
@@ -122,6 +165,10 @@ def _render_event(event):
     if etype == "thinking":
         console.print(f"[dim]Step {data['step']}...[/dim]", end=" ")
 
+    elif etype == "plan":
+        console.print()
+        console.print(Panel(Markdown(data["content"]), title="Plan", border_style="blue"))
+
     elif etype == "assistant_message":
         console.print()
         console.print(Markdown(data["content"]))
@@ -129,7 +176,6 @@ def _render_event(event):
     elif etype == "tool_call":
         tool = data["tool"]
         console.print(f"\n[yellow]> {tool}[/yellow]", end="")
-        # Show brief args
         args = data.get("arguments", "")
         if len(args) > 100:
             args = args[:100] + "..."
@@ -155,11 +201,37 @@ def _render_event(event):
             border_style="green",
         ))
 
+    elif etype == "session_resume":
+        console.print(f"[dim]Resuming from step {data.get('prior_steps', 0)}...[/dim]")
+
     elif etype == "error":
         console.print(f"\n[red bold]Error:[/red bold] {data.get('error', 'unknown')}")
 
     elif etype == "context_compressed":
-        console.print("[dim](context compressed)[/dim]")
+        console.print(f"[dim](context compressed: {data.get('messages_before', '?')} -> {data.get('messages_after', '?')} messages)[/dim]")
+
+
+@app.command()
+def sessions(
+    workspace: str = typer.Option(".", "--workspace", "-w", help="Working directory."),
+):
+    """List recent agent sessions."""
+    from panda.agent.session import SessionStore
+
+    store = SessionStore(os.path.join(os.path.abspath(workspace), ".panda_sessions"))
+    session_list = store.list_sessions(limit=20)
+
+    if not session_list:
+        console.print("[dim]No sessions found.[/dim]")
+        return
+
+    console.print(f"[bold]Recent sessions ({len(session_list)}):[/bold]\n")
+    for s in session_list:
+        status = s.get("status", "unknown")
+        color = {"completed": "green", "running": "yellow", "failed": "red"}.get(status, "dim")
+        sid = s.get("id", "?")[:12]
+        steps = s.get("current_step", 0)
+        console.print(f"  [{color}]{status:>10}[/{color}]  {sid}  ({steps} steps)")
 
 
 @app.command()

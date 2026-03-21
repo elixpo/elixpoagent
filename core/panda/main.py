@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from panda.api.routes import router
+from panda.api.ws import ws_router
 from panda.config import settings
 
 structlog.configure(
@@ -26,3 +27,4 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(ws_router)
