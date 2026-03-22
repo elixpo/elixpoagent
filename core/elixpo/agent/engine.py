@@ -108,8 +108,8 @@ class AgentEngine:
                 "prior_steps": session.current_step,
             })
         else:
-            # Determine initial mode
-            session.mode = self.mode_controller.determine_initial_mode(task)
+            # Always start in PLAN mode — the AI decides when to suggest switching
+            # Session.mode defaults to PLAN already
 
             # Load long-term memories for context
             memories = []
