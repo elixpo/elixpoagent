@@ -200,6 +200,24 @@ class AgentEngine:
             assistant_msg = choice.message
             session.messages.append(assistant_msg)
 
+            # Check if AI requested a mode transition via marker
+            if assistant_msg.content:
+                ai_transition = self.mode_controller.should_transition(
+                    session.mode, assistant_msg.content
+                )
+                if ai_transition is not None and ai_transition != session.mode:
+                    old_mode = session.mode
+                    session.mode = ai_transition
+                    tool_context.current_mode = session.mode
+                    yield AgentEvent("mode_switch", {
+                        "from": old_mode.value,
+                        "to": session.mode.value,
+                        "session_id": session.id,
+                        "triggered_by": "ai",
+                    })
+                    # Refresh tool defs for next iteration
+                    tool_defs = self.tools.list_tool_defs(mode=session.mode)
+
             # Handle plan output in PLAN mode
             if assistant_msg.content and session.mode == AgentMode.PLAN and session.plan is None:
                 session.plan = assistant_msg.content
