@@ -44,7 +44,7 @@ def get_api_url() -> str:
     if env_url:
         return env_url
     config = load_config()
-    return config.get("api_url", "https://api.moonshot.cn/v1")
+    return config.get("api_url", "https://gen.pollinations.ai/v1")
 
 
 def get_model() -> str:
@@ -53,7 +53,7 @@ def get_model() -> str:
     if env_model:
         return env_model
     config = load_config()
-    return config.get("model", "moonshot-v1-128k")
+    return config.get("model", "openai")
 
 
 def get_perplexity_key() -> str | None:
